@@ -35,10 +35,10 @@ class Transformalizer(object):
         """
         return self.transformer(item)
 
-    def bulk_transform(self, list_of_data):
+    def bulk_transform(self, items):
         """
-        Takes a ``list_of_data``, modifies each item, and returns the
-        ``new_list`` with the modified items.
+        Takes a list of ``items``, modifies each item, and returns a new list
+        with the modified items.
         """
-        return [self.transform(item) for item in list_of_data]
+        return [self.transform(item) for item in items]
 

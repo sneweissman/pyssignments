@@ -1,4 +1,5 @@
 import unittest
+from unittest import skip
 import os
 
 class TestWordCounter(unittest.TestCase):
@@ -75,7 +76,7 @@ class TestWordCounter(unittest.TestCase):
             with another string. Only time will tell which words these may be.
         """
         comparative_string = "This is just another string buying some time."
-        expected_shared_words = ("this", "is", "another", "string", "time")
+        expected_shared_words = ("this", "is", "another", "string", "time", "some")
         c = self._make_counter()
         c.read_text_string(base_string)
         shared_words = c.shared_words_in_string(comparative_string)
@@ -109,6 +110,7 @@ class TestWordCounter(unittest.TestCase):
         c.read_text_string(example_string)
 
         for word_count_string in c.generate_word_count_strings():
+            print word_count_string, "\n"
             word_count_strings.remove(word_count_string)
 
         self.assertSequenceEqual(word_count_strings, [])

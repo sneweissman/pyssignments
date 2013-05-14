@@ -13,7 +13,7 @@ tests written in tests.py pass. As on the previous assignment you will not need
 to change a line of code in tests.py.
 """
 import re
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 
 class WordCounter(object):
@@ -32,8 +32,8 @@ class WordCounter(object):
         some of these data structures.
         """
         self._all_words = []
-        self._unique_words = []
-        self._word_counts = {}
+        self._unique_words = set()
+        self._word_counts = Counter()
 
     def read_text_string(self, text_string):
         """
@@ -41,9 +41,9 @@ class WordCounter(object):
         be called repeatedly to read multiple text strings into memory for
         querying.
         """
-        read_words_list = self.get_word_list(text_string)
+        read_words_list = self.get_word_list(text_string.strip())
         self._all_words.extend(read_words_list)
-        self._unique_words += read_words_list
+        self._unique_words |= set(read_words_list)
         self._update_word_counts(read_words_list)
 
     def get_word_list(self, text_string):
@@ -52,7 +52,7 @@ class WordCounter(object):
         contained in that text.
         """
         non_alphanum_pattern = re.compile('\W+')
-        read_words_list = non_alphanum_pattern.split(text_string)
+        read_words_list = [word.lower() for word in non_alphanum_pattern.split(text_string) if word]
         return read_words_list
 
     def read_text_file(self, file_path):
@@ -61,7 +61,7 @@ class WordCounter(object):
         words in that text file into the class's memory.
         """
         for f_line in open(file_path):
-            self.read_text_string(f_line)
+            self.read_text_string(f_line)            
 
     def _get_word_counts(self, words_list):
         """
@@ -102,7 +102,8 @@ class WordCounter(object):
                     ten words will be returned, ordered by most frequent word
                     first.
         """
-        return []
+        sorted_words = sorted(self._word_counts, key=self._word_counts.get, reverse=True)
+        return sorted_words[0:number_of_words]
 
     def get_words_by_count(self, count):
         """
@@ -110,7 +111,7 @@ class WordCounter(object):
         of times specified by count. If you pass in 10 for count, you will get
         all words that occur in the text exactly 10 times.
         """
-        return []
+        return [word for word in self._word_counts if self._word_counts[word] == count]
 
     def get_unique_words(self):
         """
@@ -129,7 +130,11 @@ class WordCounter(object):
         """
         comp_word_list = self.get_word_list(comparative_string)
         # Figure out which new words are shared with already counted words.
-        return []
+
+        # sort comp_word_list and sort word list of the object
+        # iterate shortest list over the longest list with bin search
+
+        return list(set(comp_word_list) & self._unique_words)
 
     def generate_word_count_strings(self):
         """
@@ -151,10 +156,8 @@ class WordCounter(object):
         text input it would be silly to store a HUGE list of strings in memory
         , each of which differs from all the others by only a few characters.
         """
-        string_format = "The word '%(word)s' has been counted %(count)s times."
-        word = "test word"
-        count = 10
+        string_format = "The word '%(word)s' has been counted %(count)s %(timestr)s."
 
-        word_count_string = string_format % {"word": word, "count": count}
+        for word in self._word_counts:
+            yield string_format % {"word": word, "count": self._word_counts[word], "timestr": "time" if self._word_counts[word] == 1 else "times"}
 
-        return word_count_string
